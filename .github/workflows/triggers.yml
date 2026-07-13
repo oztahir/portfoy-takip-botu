@@ -1,0 +1,30 @@
+name: Portfoy Tetikleyici Kontrolu
+
+on:
+  schedule:
+    # Not: GitHub Actions cron zamanlari UTC'dir. Turkiye (TRT) = UTC+3.
+    # Asagidaki ornek, TRT ile 10:00, 14:00, 18:00, 22:00'de calisir
+    # (UTC karsiligi: 07:00, 11:00, 15:00, 19:00).
+    - cron: "0 7,11,15,19 * * *"
+  workflow_dispatch: {}   # Elle "Run workflow" ile de tetikleyebilirsin
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu indir
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bagimliliklari yukle
+        run: pip install -r requirements.txt
+
+      - name: Tetikleyicileri kontrol et
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python check_triggers.py
