@@ -1,0 +1,36 @@
+name: Haber Tetikleyici Kontrolu
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # her 30 dakikada bir (UTC bazli)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # seen.json dosyasini repoya geri yazabilmek icin gerekli
+
+jobs:
+  check-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu indir
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bagimliliklari yukle
+        run: pip install -r requirements.txt
+
+      - name: Haberleri kontrol et
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python news_triggers.py
+
+      - name: Gorulen haber listesini kaydet
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "seen.json guncellendi [otomatik]"
+          file_pattern: seen.json
