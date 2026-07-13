@@ -130,8 +130,7 @@ def check_gold() -> list[str]:
 # ANA AKIŞ
 # ---------------------------------------------------------------------------
 
-def main():
-    send_telegram_message("🔔 Test: Bot çalışıyor!") 
+def main(): 
     all_alerts = []
     all_alerts += check_stocks()
     all_alerts += check_crypto()
